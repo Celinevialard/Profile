@@ -10,10 +10,9 @@
 <body>
   <header class="hero">
     <div class="hero-inner">
-      <h1>Célia, 28 — Sportive & Curieuse</h1>
-      <p class="sub">elle/elle • Grandeie au Bouveret • Vit à Martigny</p>
+      <h1>Célia, 28 — Sportive du dimanche & Curieuse</h1>
+      <p class="sub">Fun et respectueuses • Aventures sans prise de tête bienvenues.</p>
       <div class="badges">
-        <span class="chip">elle / elle</span>
         <span class="chip">28</span>
         <span class="chip">Martigny</span>
       </div>
@@ -24,29 +23,25 @@
     <section class="profile">
       <div class="gallery-full">
         <img src="images/photo1.jpg" alt="Photo 1 — Célia" class="main-photo">
-        <div class="thumbs" aria-hidden="true">
-          <img src="images/photo2.jpg" alt="">
-          <img src="images/photo3.jpg" alt="">
-          <img src="images/photo4.jpg" alt="">
-        </div>
+        <div class="thumbs" role="list" aria-label="Sélectionner une photo"></div>
       </div>
 
       <div class="right concise">
         <h2>Salut — je suis Célia</h2>
         <p class="lead">28 ans · Sportive · Originaire du Bouveret · Vit à Martigny</p>
 
-        <p class="short"><strong>Recherche :</strong> rencontres consensuelles, fun et respectueuses — aventures sans prise de tête bienvenues.</p>
+        <p class="short">Je ne cherche pas l'amour, car l'amour de ma vie je l'ai trouvé : la nourriture.</p>
 
         <div class="contact">
-          <a href="YOUR_GOOGLE_FORM_URL" target="_blank" class="btn">Contacter</a>
+          <a href="https://forms.gle/eYCW2ytV7w4xbUct6" target="_blank" class="btn">Contacter</a>
         </div>
 
         <details class="more" role="group">
           <summary>Plus d'infos</summary>
           <div class="more-inner">
             <p><strong>Pronoms :</strong> elle / elle</p>
-            <p><strong>Centres : </strong>running, fitness, rando, voyages, cuisine entre amis</p>
-            <p><strong>Disponible pour :</strong> sorties, sport ensemble, escapades ou rencontres plus torrides selon l'envie.</p>
+            <p><strong>Centres : </strong>fitness, rando, voyages, soirée jeux de société</p>
+            <p><strong>Disponible pour :</strong> sorties, sport ensemble, escapades ou netflix and chill 😉.</p>
 
             <p class="quote"><em>« Vivre chaque jour comme une petite aventure. »</em></p>
 
@@ -75,7 +70,130 @@
   </main>
 
   <footer class="footer">
-    <p>Profil créé pour Célia • Remplacez les images dans le dossier images/ et le lien Google Form.</p>
+    <p>Profil créé pour Célia.</p>
   </footer>
+
+  <script>
+    const photos = Array.from({ length: 6 }, (_, index) => `images/photo${index + 1}.jpg`);
+    const thumbsContainer = document.querySelector('.thumbs');
+    const mainPhoto = document.querySelector('.main-photo');
+    const lightbox = document.createElement('div');
+    const lightboxImage = document.createElement('img');
+    const lightboxClose = document.createElement('button');
+    const lightboxPrev = document.createElement('button');
+    const lightboxNext = document.createElement('button');
+    let thumbButtons = [];
+    let activeIndex = 0;
+
+    lightbox.className = 'lightbox';
+    lightboxImage.className = 'lightbox-image';
+    lightboxClose.className = 'lightbox-close';
+    lightboxClose.type = 'button';
+    lightboxClose.innerHTML = '×';
+    lightboxClose.setAttribute('aria-label', 'Fermer la photo');
+
+    lightboxPrev.className = 'lightbox-nav lightbox-prev';
+    lightboxPrev.type = 'button';
+    lightboxPrev.setAttribute('aria-label', 'Photo précédente');
+    lightboxPrev.innerHTML = '‹';
+
+    lightboxNext.className = 'lightbox-nav lightbox-next';
+    lightboxNext.type = 'button';
+    lightboxNext.setAttribute('aria-label', 'Photo suivante');
+    lightboxNext.innerHTML = '›';
+
+    lightbox.appendChild(lightboxClose);
+    lightbox.appendChild(lightboxPrev);
+    lightbox.appendChild(lightboxNext);
+    lightbox.appendChild(lightboxImage);
+    document.body.appendChild(lightbox);
+
+    function renderCurrentPhoto() {
+      mainPhoto.src = photos[activeIndex];
+      mainPhoto.alt = `Photo ${activeIndex + 1} — Célia`;
+
+      thumbButtons.forEach((button, buttonIndex) => {
+        button.classList.toggle('active', buttonIndex === activeIndex);
+      });
+
+      if (lightbox.classList.contains('active')) {
+        lightboxImage.src = photos[activeIndex];
+        lightboxImage.alt = `Photo ${activeIndex + 1} — Célia`;
+      }
+    }
+
+    function openLightbox() {
+      lightbox.classList.add('active');
+      lightboxImage.src = photos[activeIndex];
+      lightboxImage.alt = `Photo ${activeIndex + 1} — Célia`;
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+    }
+
+    function goToPhoto(index) {
+      activeIndex = (index + photos.length) % photos.length;
+      renderCurrentPhoto();
+    }
+
+    lightbox.addEventListener('click', closeLightbox);
+    lightboxImage.addEventListener('click', (event) => event.stopPropagation());
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', (event) => {
+      event.stopPropagation();
+      goToPhoto(activeIndex - 1);
+      openLightbox();
+    });
+    lightboxNext.addEventListener('click', (event) => {
+      event.stopPropagation();
+      goToPhoto(activeIndex + 1);
+      openLightbox();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (!lightbox.classList.contains('active')) return;
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        goToPhoto(activeIndex - 1);
+        openLightbox();
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        goToPhoto(activeIndex + 1);
+        openLightbox();
+      }
+
+      if (event.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+
+    function buildGallery() {
+      thumbsContainer.innerHTML = '';
+      thumbButtons = [];
+
+      photos.forEach((src, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `thumb-btn${index === 0 ? ' active' : ''}`;
+        button.dataset.index = index;
+        button.setAttribute('aria-label', `Afficher la photo ${index + 1}`);
+        button.innerHTML = `<img src="${src}" alt="Photo ${index + 1} — Célia">`;
+        button.addEventListener('click', () => {
+          goToPhoto(index);
+          openLightbox();
+        });
+        thumbsContainer.appendChild(button);
+        thumbButtons.push(button);
+      });
+    }
+
+    buildGallery();
+    mainPhoto.addEventListener('click', openLightbox);
+    goToPhoto(0);
+  </script>
 </body>
 </html>
